@@ -1,0 +1,4095 @@
+{
+"openapi": "3.0.1",
+"info": {
+"title": "DataWarehouse API",
+"description": "# Generelt\nDersom ikke annet er avtalt blir datainnholdet eksportert fra brukerens Cordel en gang pr døgn. Innholdet i api-et er derfor ikke en live representasjon av innholdet i brukerens Cordel.\n\nBase-url for apiet er `https://api.smartcraft.cloud/DataWarehouse`. Slik at der hvor dokumentasjonen angir `/api/<endepunkt>` blir komplett url for endepunktet:\n`https://api.smartcraft.cloud/DataWarehouse/api/<endepunkt>`\n\nNoen rammeverk legger ikke automatisk med User-Agent i HTTP header. Det er nødvendig å legge til denne for at requesten skal gå gjennom.\n\n# Autentifisering\nFor å gjøre kall mot DataWarehouse-apiet trengs en AuthToken som skal følge alle request. AuthToken skaffes ved å gjøre en request til https://api.smartcraft.cloud/auth endepunktet som inneholder brukernavn og passord.  \nTenantId er kun nødvendig dersom brukeren har tilgang på flere tenants, og skal normalt ikke angis.\n```\nPOST /auth\n{\n    \"username\": \"string\",\n    \"password\": \"string\",\n    \"tenantId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\n}\n```\nI retur mottas et objekt som inneholder **AuthToken** som skal benyttes i videre kall mot DataWarehouse-apiet. Returen inneholder også en **RefreshToken** som cookie. Denne cookien kan benyttes senere for\nå skaffe en ny authToken når authToken er utløpt:\n```json\n{\n    \"authToken\": \"string\",                     // AutToken som brukes i senere requests\n    \"expires\": \"2021-12-20T11:41:03.771Z\",     // Tidspunkt for utløp av refresh-token\n    \"authExpires\": \"2021-12-20T11:41:03.771Z\"  // Tidspunkt for utløp av authToken\n}\n```\nAlle etterfølgende request skal ha en bearer-token i headeren: `Authorization: Bearer <authToken>`\n \nFor å skaffe ny authToken når denne er utløpt gjøres et kall mot **/auth/refresh** endepunktet med cookien for refresh-token satt. `GET /auth/refresh` Returverdien her er den samme som for **/auth**\n",
+"version": "v1"
+},
+"paths": {
+"/api/CashRegisters": {
+"get": {
+"tags": [
+"CashRegisters"
+],
+"summary": "Les alle kassepunkt",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "default pagesize er 50",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/CashRegisterGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CashRegisterGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/CashRegisterGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/CashRegisters/{cashRegisterId}": {
+"get": {
+"tags": [
+"CashRegisters"
+],
+"summary": "Les et kassepunkt",
+"parameters": [
+{
+"name": "cashRegisterId",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/CashRegisterGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CashRegisterGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/CashRegisterGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/CashRegisters/{cashRegisterId}/Transactions": {
+"get": {
+"tags": [
+"CashRegisters"
+],
+"summary": "Les kassetransaksjoner i et kassepunkt.",
+"parameters": [
+{
+"name": "cashRegisterId",
+"in": "path",
+"description": "Cordels id til kassepunktet",
+"required": true,
+"schema": {
+"type": "string"
+}
+},
+{
+"name": "pageSize",
+"in": "query",
+"description": "default pagesize er 50",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "les transaksjoner som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/CashTransactionGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CashTransactionGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/CashTransactionGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/CashTransactions": {
+"get": {
+"tags": [
+"CashTransactions"
+],
+"summary": "Les alle kasse-transaksjoner",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "default pagesize er 50",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "Les transaksjoner som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/CashTransactionGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CashTransactionGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/CashTransactionGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/CashTransactions/{cashTransactionId}": {
+"get": {
+"tags": [
+"CashTransactions"
+],
+"summary": "Les en kasse-transaksjon",
+"parameters": [
+{
+"name": "cashTransactionId",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "string"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/CashTransactionGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CashTransactionGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/CashTransactionGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Configuration": {
+"get": {
+"tags": [
+"Configuration"
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/ConfigurationDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/ConfigurationDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/ConfigurationDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/CustomerInvoices": {
+"get": {
+"tags": [
+"CustomerInvoices"
+],
+"summary": "Les alle fakturaer, sortert på fakturanummer",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "default pagesize er 50",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "les fakturaer som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+},
+{
+"name": "onlyWithPayable",
+"in": "query",
+"description": "les bare fakturaer som har PayableAmount",
+"schema": {
+"type": "boolean",
+"default": false
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/CustomerInvoiceGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerInvoiceGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerInvoiceGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/CustomerInvoices/{invoiceNumber}": {
+"get": {
+"tags": [
+"CustomerInvoices"
+],
+"summary": "Les en faktura",
+"parameters": [
+{
+"name": "invoiceNumber",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/CustomerInvoiceGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerInvoiceGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerInvoiceGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/CustomerPayments": {
+"get": {
+"tags": [
+"CustomerPayments"
+],
+"summary": "Les alle innbetalinger, sortert på år og bilagnummer.",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "default pagesize er 50",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "les betalinger som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/CustomerPaymentGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerPaymentGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerPaymentGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/CustomerPayments/{year}/{voucherNumber}": {
+"get": {
+"tags": [
+"CustomerPayments"
+],
+"summary": "Les en innbetaling",
+"parameters": [
+{
+"name": "year",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "voucherNumber",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int64"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/CustomerPaymentGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerPaymentGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerPaymentGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Customers": {
+"get": {
+"tags": [
+"Customers"
+],
+"summary": "Lese alle kunder, sortert på kundenummer",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "default pagesize er 50",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "les kunder som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/CustomerGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Customers/{customerNumber}": {
+"get": {
+"tags": [
+"Customers"
+],
+"summary": "Les en kunde",
+"parameters": [
+{
+"name": "customerNumber",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/CustomerGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/CustomerGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Employees": {
+"get": {
+"tags": [
+"Employees"
+],
+"summary": "Les alle ansatte - sortert på ansatt-nummer (EmployeeNumber)",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "Default pagesize er 50",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "Default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "Les medarbeidere som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Employees/{employeeNumber}": {
+"get": {
+"tags": [
+"Employees"
+],
+"summary": "Les en ansatt",
+"parameters": [
+{
+"name": "employeeNumber",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int64"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/LedgerYears": {
+"get": {
+"tags": [
+"LedgerYears"
+],
+"summary": "Les alle regnskapsår, ink. kontoplan - sortert på år. Hovedbokskontoene er sortert på kontonummer.",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "default pagesize er 50",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "Les regnskapsår som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/LedgerYearGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/LedgerYearGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/LedgerYearGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/LedgerYears/{year}": {
+"get": {
+"tags": [
+"LedgerYears"
+],
+"summary": "Les et regnskapsår",
+"parameters": [
+{
+"name": "year",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/LedgerYearGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/LedgerYearGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/LedgerYearGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Ping": {
+"get": {
+"tags": [
+"Ping"
+],
+"responses": {
+"200": {
+"description": "OK"
+}
+}
+}
+},
+"/api/Projects": {
+"get": {
+"tags": [
+"Projects"
+],
+"summary": "Lese alle ordrer sortert på ordrenummer.",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "default pagesize er 20",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "Les prosjekter som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/ProjectGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/ProjectGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/ProjectGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Projects/Overview": {
+"get": {
+"tags": [
+"Projects"
+],
+"summary": "Les prosjekt-oversikt. Returnerer forenklede prosjekt-objekter.",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "default pagesize er 50",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/ProjectOverviewDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/ProjectOverviewDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/ProjectOverviewDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Projects/{projectNumber}": {
+"get": {
+"tags": [
+"Projects"
+],
+"summary": "Les et prosjekt",
+"parameters": [
+{
+"name": "projectNumber",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int64"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/ProjectGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/ProjectGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/ProjectGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/SupplierInvoices": {
+"get": {
+"tags": [
+"SupplierInvoices"
+],
+"summary": "Les alle leverandør-fakturaer, sortert på fakturadato",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "Les fakturaer som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+},
+{
+"name": "onlyWithPayable",
+"in": "query",
+"description": "les bare fakturaer som har PayableAmount",
+"schema": {
+"type": "boolean",
+"default": false
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/SupplierInvoiceGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierInvoiceGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierInvoiceGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/SupplierInvoices/{year}/{voucherNumber}": {
+"get": {
+"tags": [
+"SupplierInvoices"
+],
+"summary": "Les en leverandør-faktura",
+"parameters": [
+{
+"name": "year",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "voucherNumber",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/SupplierInvoiceGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierInvoiceGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierInvoiceGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/SupplierPayments": {
+"get": {
+"tags": [
+"SupplierPayments"
+],
+"summary": "Les alle utbetalinger, sortert på regnskapsår og bilagnummer.",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "Les betalinger som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/SupplierPaymentGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierPaymentGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierPaymentGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/SupplierPayments/{year}/{voucherNumber}": {
+"get": {
+"tags": [
+"SupplierPayments"
+],
+"summary": "Les en utbetaling",
+"parameters": [
+{
+"name": "year",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "voucherNumber",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/SupplierPaymentGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierPaymentGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierPaymentGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Suppliers": {
+"get": {
+"tags": [
+"Suppliers"
+],
+"summary": "Les alle leverandører, sortert regnskapsår og bilagnummer",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "default pagesize er 50",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "Les leverandører som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/SupplierGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Suppliers/{supplierNumber}": {
+"get": {
+"tags": [
+"Suppliers"
+],
+"summary": "Les en leverandør",
+"parameters": [
+{
+"name": "supplierNumber",
+"in": "path",
+"description": "",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/SupplierGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/SupplierGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Vouchers": {
+"get": {
+"tags": [
+"Vouchers"
+],
+"summary": "Les bilag, sortert på regnskapsår, bilagtype og bilagnummer.",
+"parameters": [
+{
+"name": "pageSize",
+"in": "query",
+"description": "Default pagesize er 50",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "pageNumber",
+"in": "query",
+"description": "Default pagenumber er 0",
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "submittedAfter",
+"in": "query",
+"description": "Les bilag som er oppdatert etter gitt tidspunkt (UTC)",
+"schema": {
+"type": "string",
+"format": "date-time"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/VoucherGetDTOListResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/VoucherGetDTOListResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/VoucherGetDTOListResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Vouchers/{year}/{voucherType}/{voucherNumber}": {
+"get": {
+"tags": [
+"Vouchers"
+],
+"summary": "Les et bilag",
+"parameters": [
+{
+"name": "year",
+"in": "path",
+"description": "regnskapsår",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "voucherType",
+"in": "path",
+"description": "bilagtype (1-7)",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+},
+{
+"name": "voucherNumber",
+"in": "path",
+"description": "bilagnummer",
+"required": true,
+"schema": {
+"type": "integer",
+"format": "int32"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK",
+"content": {
+"text/plain": {
+"schema": {
+"$ref": "#/components/schemas/VoucherGetDTOResponseDTO"
+}
+},
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/VoucherGetDTOResponseDTO"
+}
+},
+"text/json": {
+"schema": {
+"$ref": "#/components/schemas/VoucherGetDTOResponseDTO"
+}
+}
+}
+}
+}
+}
+},
+"/api/Vouchers/Documents/{documentId}": {
+"get": {
+"tags": [
+"Vouchers"
+],
+"summary": "Last ned et dokument/vedlegg på et bilag.",
+"parameters": [
+{
+"name": "documentId",
+"in": "path",
+"description": "id til dokumentet.",
+"required": true,
+"schema": {
+"type": "string",
+"format": "uuid"
+}
+}
+],
+"responses": {
+"200": {
+"description": "OK"
+}
+}
+}
+}
+},
+"components": {
+"schemas": {
+"CashRegisterGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"description": "Kassepunktets unike id i datavarehuset",
+"format": "uuid"
+},
+"cashRegisterId": {
+"type": "string",
+"description": "Cordels kassepunkt-id.",
+"nullable": true
+},
+"name": {
+"type": "string",
+"description": "Kassepunktets navn",
+"nullable": true
+},
+"firstSubmitted": {
+"type": "string",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"format": "date-time"
+}
+},
+"additionalProperties": false
+},
+"CashRegisterGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/CashRegisterGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"CashRegisterGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/CashRegisterGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"CashTransactionDiscountDTO": {
+"type": "object",
+"properties": {
+"discountType": {
+"type": "string",
+"nullable": true
+},
+"discountAmount": {
+"type": "number",
+"format": "double"
+}
+},
+"additionalProperties": false
+},
+"CashTransactionGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"cashRegisterId": {
+"type": "string",
+"description": "Id til kassepunktet som transaksjonen kommer fra. \r\nNB dette er Cordels kassepunkt-id, ikke C3-DataWarehouse sin interne id.",
+"nullable": true
+},
+"transactionNumber": {
+"type": "string",
+"nullable": true
+},
+"transactionId": {
+"type": "string",
+"nullable": true
+},
+"transactionType": {
+"type": "string",
+"nullable": true
+},
+"amountIncVat": {
+"type": "number",
+"format": "double"
+},
+"amountExVat": {
+"type": "number",
+"format": "double"
+},
+"amountType": {
+"type": "string",
+"nullable": true
+},
+"employeeId": {
+"type": "string",
+"nullable": true
+},
+"customerSupplierId": {
+"type": "string",
+"nullable": true
+},
+"periodNumber": {
+"type": "integer",
+"format": "int32"
+},
+"transactionDateAndTime": {
+"type": "string",
+"format": "date-time"
+},
+"refId": {
+"type": "string",
+"nullable": true
+},
+"description": {
+"type": "string",
+"nullable": true
+},
+"signature": {
+"type": "string",
+"nullable": true
+},
+"keyVersion": {
+"type": "string",
+"nullable": true
+},
+"receiptNum": {
+"type": "integer",
+"format": "int32"
+},
+"receiptCopyNum": {
+"type": "integer",
+"format": "int32"
+},
+"voidTransaction": {
+"type": "boolean"
+},
+"firstSubmitted": {
+"type": "string",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"format": "date-time"
+},
+"lines": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/CashTransactionLineDTO"
+},
+"nullable": true
+},
+"vat": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/CashTransactionVatDTO"
+},
+"nullable": true
+},
+"discounts": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/CashTransactionDiscountDTO"
+},
+"nullable": true
+},
+"payments": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/CashTransactionPaymentDTO"
+},
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"CashTransactionGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/CashTransactionGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"CashTransactionGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/CashTransactionGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"CashTransactionLineDTO": {
+"type": "object",
+"properties": {
+"lineId": {
+"type": "string",
+"nullable": true
+},
+"lineType": {
+"type": "string",
+"nullable": true
+},
+"articleGroupId": {
+"type": "string",
+"nullable": true
+},
+"articleId": {
+"type": "string",
+"nullable": true
+},
+"quantity": {
+"type": "number",
+"format": "double"
+},
+"amountIncVat": {
+"type": "number",
+"format": "double"
+},
+"amountExVat": {
+"type": "number",
+"format": "double"
+},
+"amountType": {
+"type": "string",
+"nullable": true
+},
+"pricePerUnit": {
+"type": "number",
+"format": "double"
+},
+"costPrice": {
+"type": "number",
+"format": "double"
+},
+"description": {
+"type": "string",
+"nullable": true
+},
+"costId": {
+"type": "string",
+"nullable": true
+},
+"accountNumber": {
+"type": "integer",
+"format": "int32"
+},
+"discountType": {
+"type": "string",
+"nullable": true
+},
+"discountAmount": {
+"type": "number",
+"format": "double"
+},
+"vatPercent": {
+"type": "number",
+"format": "double"
+},
+"vatAmount": {
+"type": "number",
+"format": "double"
+},
+"vatBaseAmount": {
+"type": "number",
+"format": "double"
+}
+},
+"additionalProperties": false
+},
+"CashTransactionPaymentDTO": {
+"type": "object",
+"properties": {
+"paymentType": {
+"type": "string",
+"nullable": true
+},
+"paidAmount": {
+"type": "number",
+"format": "double"
+}
+},
+"additionalProperties": false
+},
+"CashTransactionVatDTO": {
+"type": "object",
+"properties": {
+"vatPercent": {
+"type": "number",
+"format": "double"
+},
+"vatAmount": {
+"type": "number",
+"format": "double"
+},
+"vatBaseAmount": {
+"type": "number",
+"format": "double"
+}
+},
+"additionalProperties": false
+},
+"ConfigurationDTO": {
+"type": "object",
+"properties": {
+"version": {
+"type": "string",
+"nullable": true
+},
+"baseLibraryVersion": {
+"type": "string",
+"nullable": true
+},
+"user": {
+"$ref": "#/components/schemas/UserInfoDTO"
+},
+"database": {
+"$ref": "#/components/schemas/DatabaseInfoDTO"
+},
+"eventBus": {
+"$ref": "#/components/schemas/EventBusConfigDTO"
+}
+},
+"additionalProperties": false
+},
+"CustomerGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"customerNumber": {
+"type": "integer",
+"description": "Kundenummer - unikt per tenant",
+"format": "int64"
+},
+"organizationNumber": {
+"type": "string",
+"nullable": true
+},
+"name": {
+"type": "string",
+"nullable": true
+},
+"address": {
+"type": "string",
+"nullable": true
+},
+"postalCode": {
+"type": "string",
+"nullable": true
+},
+"postalAddress": {
+"type": "string",
+"nullable": true
+},
+"active": {
+"type": "boolean"
+},
+"firstSubmitted": {
+"type": "string",
+"description": "Første gang kunden ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"description": "Siste gang kunden ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"userDefFields": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/UserDefFieldGetDTO"
+},
+"description": "Liste av brukerdefinerte felter",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"CustomerGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/CustomerGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"CustomerGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/CustomerGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"CustomerInvoiceGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"customerNumber": {
+"type": "integer",
+"format": "int64"
+},
+"customerName": {
+"type": "string",
+"nullable": true
+},
+"invoiceNumber": {
+"type": "integer",
+"description": "Fakturanummer",
+"format": "int64"
+},
+"kidNumber": {
+"type": "string",
+"description": "Kid-nummer",
+"nullable": true
+},
+"projectNumber": {
+"type": "integer",
+"description": "Evt. ordre/prosjekt-nummer",
+"format": "int64",
+"nullable": true
+},
+"caseHandler": {
+"type": "string",
+"description": "Saksbehandler",
+"nullable": true
+},
+"department": {
+"type": "string",
+"description": "Avdeling",
+"nullable": true
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse/stikkord",
+"nullable": true
+},
+"invoiceDate": {
+"type": "string",
+"description": "Faktura dato",
+"format": "date-time"
+},
+"ledgerDate": {
+"type": "string",
+"description": "Bokført dato",
+"format": "date-time"
+},
+"period": {
+"type": "integer",
+"description": "Periode fakturaen er bokført på. 0= inng balanse, 13 = årsavslutningsposteringer,  1 - 12 er måned i året.",
+"format": "int32",
+"nullable": true
+},
+"dueDate": {
+"type": "string",
+"description": "Forfallsdato",
+"format": "date-time",
+"nullable": true
+},
+"amount": {
+"type": "number",
+"description": "Fakturabeløp eks. mva.",
+"format": "double"
+},
+"amountIncVat": {
+"type": "number",
+"description": "Fakturabeløp ink. mva.",
+"format": "double"
+},
+"vatAmount": {
+"type": "number",
+"description": "Mva beløp",
+"format": "double"
+},
+"invoiceFee": {
+"type": "number",
+"description": "Fakturagebyr eks. mva.",
+"format": "double"
+},
+"invoiceFeeIncVat": {
+"type": "number",
+"description": "Fakturagebyr ink. mva.",
+"format": "double"
+},
+"payableAmount": {
+"type": "number",
+"description": "Restanse - Null dersom ikke eksportert fra Cordel",
+"format": "double",
+"nullable": true
+},
+"bankAccount": {
+"type": "string",
+"description": "Betalingsmottakers bankkontonummer",
+"nullable": true
+},
+"firstSubmitted": {
+"type": "string",
+"description": "Første gang fakturaen ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"description": "Siste gang fakturaen ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"invoiceLines": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/CustomerInvoiceLineGetDTO"
+},
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"CustomerInvoiceGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/CustomerInvoiceGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"CustomerInvoiceGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/CustomerInvoiceGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"CustomerInvoiceLineGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"type": {
+"type": "string",
+"description": "Linje-type: \"Product\" (vare), \"Work\" (time/arbeid), \"Amount\" (rundsum)",
+"nullable": true
+},
+"amountType": {
+"type": "string",
+"description": "Type rundsum: \"Standard\", \"Deposit\" (akonto), \"Prepayment\" (forskudd)",
+"nullable": true
+},
+"code": {
+"type": "string",
+"description": "Vare-/timekode",
+"nullable": true
+},
+"category": {
+"type": "string",
+"description": "Kategori/fagområde",
+"nullable": true
+},
+"centrallyMaintained": {
+"type": "boolean",
+"description": "Sentralt vedlikeholdt (fra prissentral)",
+"nullable": true
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse",
+"nullable": true
+},
+"quantity": {
+"type": "number",
+"description": "Antall",
+"format": "double"
+},
+"unit": {
+"type": "string",
+"description": "Enhet",
+"nullable": true
+},
+"listPrice": {
+"type": "number",
+"description": "Listepris",
+"format": "double"
+},
+"costPrice": {
+"type": "number",
+"description": "Selvkost",
+"format": "double"
+},
+"amountWork": {
+"type": "number",
+"description": "Beløp arbeid",
+"format": "double"
+},
+"amountMaterial": {
+"type": "number",
+"description": "Beløp materiell",
+"format": "double"
+},
+"amountVat": {
+"type": "number",
+"description": "Beløp mva",
+"format": "double"
+}
+},
+"additionalProperties": false
+},
+"CustomerPaymentGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"year": {
+"type": "integer",
+"description": "Regnskapsår",
+"format": "int32"
+},
+"voucherNumber": {
+"type": "integer",
+"description": "Bilagnummer",
+"format": "int64"
+},
+"paymentDate": {
+"type": "string",
+"description": "Betalingsdato",
+"format": "date-time"
+},
+"ledgerDate": {
+"type": "string",
+"description": "Bokført dato",
+"format": "date-time"
+},
+"period": {
+"type": "integer",
+"description": "Periode fakturaen er bokført på. 0= inng balanse, 13 = årsavslutningsposteringer,  1 - 12 er måned i året.",
+"format": "int32",
+"nullable": true
+},
+"amount": {
+"type": "number",
+"description": "Betalt beløp",
+"format": "double"
+},
+"bankAccount": {
+"type": "string",
+"description": "Bankkonto - (mottakers-konto)",
+"nullable": true
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse",
+"nullable": true
+},
+"firstSubmitted": {
+"type": "string",
+"description": "Første gang betalingen ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"description": "Siste gang betalingen ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"paymentLines": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/CustomerPaymentLineGetDTO"
+},
+"description": "Angir hva som er betalt: fakturaer, akonto fra kunder osv.",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"CustomerPaymentGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/CustomerPaymentGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"CustomerPaymentGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/CustomerPaymentGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"CustomerPaymentLineGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"customerNumber": {
+"type": "integer",
+"description": "Kundenummer - refererer til en Customer",
+"format": "int32"
+},
+"customerInvoiceNumber": {
+"type": "integer",
+"description": "Fakturanummer - refererer til en CustomerInvoice. Kan vÃ¦re null ved akonto-betalinger.",
+"format": "int32",
+"nullable": true
+},
+"amount": {
+"type": "number",
+"description": "Betalt beløp",
+"format": "double"
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"DatabaseInfoDTO": {
+"type": "object",
+"properties": {
+"migrateOnStartup": {
+"type": "boolean"
+},
+"migrationHistory": {
+"type": "array",
+"items": {
+"type": "string"
+},
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"DocumentDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"fileName": {
+"type": "string",
+"nullable": true
+},
+"submitted": {
+"type": "string",
+"format": "date-time"
+}
+},
+"additionalProperties": false
+},
+"EmployeeGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"employeeNumber": {
+"type": "integer",
+"format": "int64"
+},
+"firstName": {
+"type": "string",
+"nullable": true
+},
+"lastName": {
+"type": "string",
+"nullable": true
+},
+"address": {
+"type": "string",
+"nullable": true
+},
+"postalCode": {
+"type": "string",
+"nullable": true
+},
+"postalAddress": {
+"type": "string",
+"nullable": true
+},
+"telephone": {
+"type": "string",
+"nullable": true
+},
+"email": {
+"type": "string",
+"nullable": true
+},
+"active": {
+"type": "boolean",
+"description": "Om medarbeideren er aktiv eller har sluttet (eller null for ikke angitt)",
+"nullable": true
+},
+"hourlyWage": {
+"type": "number",
+"description": "Timelønn",
+"format": "double"
+},
+"caseWorker": {
+"type": "boolean",
+"description": "Om medarbeideren er en saksbehandler"
+},
+"department": {
+"type": "string",
+"description": "Avdeling",
+"nullable": true
+},
+"external": {
+"type": "boolean",
+"description": "Ekstern / innleid"
+},
+"firstSubmitted": {
+"type": "string",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"format": "date-time"
+},
+"properties": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/EmployeePropertyDTO"
+},
+"description": "Egendefinerte felt",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"EmployeeGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/EmployeeGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"EmployeeGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/EmployeeGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"EmployeePropertyDTO": {
+"type": "object",
+"properties": {
+"key": {
+"type": "string",
+"nullable": true
+},
+"value": {
+"type": "string",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"EventBusConfigDTO": {
+"type": "object",
+"properties": {
+"serviceName": {
+"type": "string",
+"nullable": true
+},
+"rabbitMQ": {
+"$ref": "#/components/schemas/RabbitMQConfigDTO"
+}
+},
+"additionalProperties": false
+},
+"LedgerAccountGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"accountNumber": {
+"type": "integer",
+"description": "Kontonummer - kontonummer er unikt per regnskapsår",
+"format": "int32"
+},
+"accountType": {
+"type": "string",
+"description": "Konto-type: \"Assets\", \"EquityAndLiabilities\", \"Income\" eller \"Costs\"",
+"nullable": true
+},
+"name": {
+"type": "string",
+"description": "Konto-navn",
+"nullable": true
+},
+"firstSubmitted": {
+"type": "string",
+"description": "Første gang kontoen ble lagret i datavarehuset",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"description": "Sist gang kontoen ble oppdatert i datavarehuset",
+"format": "date-time"
+}
+},
+"additionalProperties": false
+},
+"LedgerPostingGetDTO": {
+"type": "object",
+"properties": {
+"accountNumber": {
+"type": "integer",
+"description": "Kontonummer - refererer til en LedgerAccount",
+"format": "int32"
+},
+"amount": {
+"type": "number",
+"description": "Beløp. Positive beløp er debet, negative beløp er kredit.",
+"format": "double"
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse",
+"nullable": true
+},
+"valueDate": {
+"type": "string",
+"format": "date-time"
+},
+"project": {
+"type": "string",
+"description": "Prosjektnummer - kostnadsbÃ¦rer",
+"nullable": true
+},
+"job": {
+"type": "string",
+"description": "Jobbnummer - kostnadsbÃ¦rer",
+"nullable": true
+},
+"department": {
+"type": "string",
+"description": "Avdeling - kostnadsbÃ¦rer",
+"nullable": true
+},
+"dimension1": {
+"type": "string",
+"description": "Egendefinert kostnadsbÃ¦rer",
+"nullable": true
+},
+"dimension2": {
+"type": "string",
+"description": "Egendefinert kostnadsbÃ¦rer",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"LedgerYearGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"year": {
+"type": "integer",
+"description": "Regnskapsår",
+"format": "int32"
+},
+"startDate": {
+"type": "string",
+"description": "Startdato for regnskapsåret",
+"format": "date-time",
+"nullable": true
+},
+"endDate": {
+"type": "string",
+"description": "Sluttdato for regnskapsåret",
+"format": "date-time",
+"nullable": true
+},
+"firstSubmitted": {
+"type": "string",
+"description": "Første gang regnskapsåret ble lagret ti datavarehuset",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"description": "Sist gang regnskapsåret ble oppdatert i datavarehuset",
+"format": "date-time"
+},
+"dimension1Name": {
+"type": "string",
+"description": "Navn på egendefinert kostnadsbÃ¦rer - Dimension1",
+"nullable": true
+},
+"dimension2Name": {
+"type": "string",
+"description": "Navn på egendefinert kostnadsbÃ¦rer - Dimension2",
+"nullable": true
+},
+"accounts": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/LedgerAccountGetDTO"
+},
+"description": "Hovedbokskontoene i regnskapsåret",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"LedgerYearGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/LedgerYearGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"LedgerYearGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/LedgerYearGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"PagingDTO": {
+"type": "object",
+"properties": {
+"defaultPageSize": {
+"type": "integer",
+"format": "int32"
+},
+"maxPageSize": {
+"type": "integer",
+"format": "int32"
+}
+},
+"additionalProperties": false
+},
+"ProjectGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"tenantId": {
+"type": "string",
+"format": "uuid"
+},
+"customerNumber": {
+"type": "integer",
+"format": "int64"
+},
+"customerName": {
+"type": "string",
+"nullable": true
+},
+"projectNumber": {
+"type": "integer",
+"description": "Ordrenummer",
+"format": "int64"
+},
+"projectReference": {
+"type": "string",
+"description": "Prosjekt-nummer i Cordel",
+"nullable": true
+},
+"projectName": {
+"type": "string",
+"description": "Prosjekt-navn",
+"nullable": true
+},
+"projectType": {
+"type": "string",
+"description": "Ordre-type",
+"nullable": true
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse/stikkord",
+"nullable": true
+},
+"department": {
+"type": "string",
+"description": "Avdeling",
+"nullable": true
+},
+"status": {
+"type": "string",
+"description": "Ordre-status: \"Started\", \"InProgress\", \"Completed\"",
+"nullable": true
+},
+"active": {
+"type": "boolean",
+"description": "Om ordren er aktiv (false = avsluttet)"
+},
+"caseHandler": {
+"type": "string",
+"description": "Saksbehandler",
+"nullable": true
+},
+"salesRep": {
+"type": "string",
+"description": "Vår selger",
+"nullable": true
+},
+"projectDate": {
+"type": "string",
+"description": "Ordre-dato",
+"format": "date-time",
+"nullable": true
+},
+"plannedDelivery": {
+"type": "string",
+"description": "Planlagt levert",
+"format": "date-time",
+"nullable": true
+},
+"startDate": {
+"type": "string",
+"description": "Dato oppstart",
+"format": "date-time",
+"nullable": true
+},
+"confirmedDate": {
+"type": "string",
+"description": "Bekreftet dato",
+"format": "date-time",
+"nullable": true
+},
+"exportDate": {
+"type": "string",
+"description": "Eksportert dato",
+"format": "date-time",
+"nullable": true
+},
+"lastModifiedDate": {
+"type": "string",
+"description": "Sist endret i Cordel",
+"format": "date-time",
+"nullable": true
+},
+"firstSubmitted": {
+"type": "string",
+"description": "Første gang ordren ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"description": "Siste gang ordren ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"items": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/ProjectItemGetDTO"
+},
+"description": "Spesifikasjon",
+"nullable": true
+},
+"invoiceItems": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/ProjectItemGetDTO"
+},
+"description": "Fakturagrunnlag",
+"nullable": true
+},
+"usedMaterial": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/ProjectUsedProductGetDTO"
+},
+"description": "Medgått materiell",
+"nullable": true
+},
+"usedWork": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/ProjectUsedHourGetDTO"
+},
+"description": "Medgått arbeid",
+"nullable": true
+},
+"jobs": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/ProjectJobGetDTO"
+},
+"description": "Jobb-liste",
+"nullable": true
+},
+"userDefFields": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/UserDefFieldGetDTO"
+},
+"description": "Liste av brukerdefinerte felter",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"ProjectGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/ProjectGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"ProjectGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/ProjectGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"ProjectItemGetDTO": {
+"type": "object",
+"properties": {
+"type": {
+"type": "string",
+"description": "Linje-type: \"Product\" (vare), \"Work\" (time/arbeid), \"Amount\" (rundsum)",
+"nullable": true
+},
+"code": {
+"type": "string",
+"description": "Vare-/timekode",
+"nullable": true
+},
+"category": {
+"type": "string",
+"description": "Kategori/fagområde",
+"nullable": true
+},
+"centrallyMaintained": {
+"type": "boolean",
+"description": "Sentralt vedlikeholdt (fra prissentral)",
+"nullable": true
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse",
+"nullable": true
+},
+"quantity": {
+"type": "number",
+"description": "Antall",
+"format": "double"
+},
+"unit": {
+"type": "string",
+"description": "Enhet",
+"nullable": true
+},
+"listPrice": {
+"type": "number",
+"description": "Listepris",
+"format": "double"
+},
+"costPrice": {
+"type": "number",
+"description": "Selvkost",
+"format": "double"
+},
+"amountWork": {
+"type": "number",
+"description": "Beløp arbeid",
+"format": "double"
+},
+"amountMaterial": {
+"type": "number",
+"description": "Beløp materiell",
+"format": "double"
+},
+"amountVat": {
+"type": "number",
+"description": "Beløp mva",
+"format": "double"
+},
+"supplierNumber": {
+"type": "integer",
+"description": "Leverandørnummer",
+"format": "int32",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"ProjectJobGetDTO": {
+"type": "object",
+"properties": {
+"jobCode": {
+"type": "string",
+"nullable": true
+},
+"description": {
+"type": "string",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"ProjectOverviewDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"projectNumber": {
+"type": "integer",
+"description": "Ordrenummer",
+"format": "int64"
+},
+"projectType": {
+"type": "string",
+"description": "Ordre-type",
+"nullable": true
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse/stikkord",
+"nullable": true
+},
+"active": {
+"type": "boolean",
+"description": "Om ordren er aktiv (false = avsluttet)"
+},
+"department": {
+"type": "string",
+"description": "Avdeling",
+"nullable": true
+},
+"firstSubmitted": {
+"type": "string",
+"description": "Første gang ordren ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"description": "Siste gang ordren ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+}
+},
+"additionalProperties": false
+},
+"ProjectOverviewDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/ProjectOverviewDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"ProjectUsedHourGetDTO": {
+"type": "object",
+"properties": {
+"employeeNumber": {
+"type": "integer",
+"description": "Medarbeider - nummer",
+"format": "int64"
+},
+"employeeName": {
+"type": "string",
+"description": "Medarbeider - navn",
+"nullable": true
+},
+"code": {
+"type": "string",
+"description": "Timekategori-nummer",
+"nullable": true
+},
+"description": {
+"type": "string",
+"description": "Timekategori-beskrivelse",
+"nullable": true
+},
+"comment": {
+"type": "string",
+"description": "Kommentar/merknad",
+"nullable": true
+},
+"internalComment": {
+"type": "string",
+"description": "Intern Kommentar/merknad",
+"nullable": true
+},
+"job": {
+"type": "string",
+"description": "Jobbnummer",
+"nullable": true
+},
+"date": {
+"type": "string",
+"description": "Dato",
+"format": "date-time"
+},
+"from": {
+"type": "string",
+"description": "Fra - dato og tidspunkt - kan vÃ¦re null",
+"format": "date-time",
+"nullable": true
+},
+"to": {
+"type": "string",
+"description": "Til - dato og tidspunkt - kan vÃ¦re null",
+"format": "date-time",
+"nullable": true
+},
+"quantity": {
+"type": "number",
+"description": "Antall timer",
+"format": "double"
+},
+"salaryRate": {
+"type": "number",
+"description": "Lønn per time",
+"format": "double"
+},
+"cost": {
+"type": "number",
+"description": "Total kostnad",
+"format": "double"
+},
+"invoicePrice": {
+"type": "number",
+"description": "Fakturapris",
+"format": "double"
+},
+"invoiceAmount": {
+"type": "number",
+"description": "Fakturabeløp",
+"format": "double"
+},
+"shouldBeInvoiced": {
+"type": "boolean",
+"description": "Indikerer om varen er lagt til i invoice lines"
+}
+},
+"additionalProperties": false,
+"description": "Timeregistrering mot et prosjekt"
+},
+"ProjectUsedProductGetDTO": {
+"type": "object",
+"properties": {
+"productCode": {
+"type": "string",
+"description": "Varenummer",
+"nullable": true
+},
+"productCategory": {
+"type": "string",
+"description": "Fagområde",
+"nullable": true
+},
+"centrallyMaintained": {
+"type": "boolean",
+"description": "Sentralt vedlikeholdt (fra prissentral)"
+},
+"description": {
+"type": "string",
+"description": "Vare-beskrivelse",
+"nullable": true
+},
+"registeredDate": {
+"type": "string",
+"description": "Dato for når varen ble registrert",
+"format": "date-time"
+},
+"comment": {
+"type": "string",
+"description": "Kommentar/merknad",
+"nullable": true
+},
+"internalComment": {
+"type": "string",
+"description": "Intern Kommentar/merknad",
+"nullable": true
+},
+"job": {
+"type": "string",
+"description": "Jobb-nummer",
+"nullable": true
+},
+"quantity": {
+"type": "number",
+"description": "Antall",
+"format": "double"
+},
+"unit": {
+"type": "string",
+"description": "Enhet",
+"nullable": true
+},
+"costPrice": {
+"type": "number",
+"description": "Kostpris",
+"format": "double"
+},
+"cost": {
+"type": "number",
+"description": "Total kostnad",
+"format": "double"
+},
+"invoicePrice": {
+"type": "number",
+"description": "Fakturapris",
+"format": "double"
+},
+"invoiceAmount": {
+"type": "number",
+"description": "Fakturabeløp",
+"format": "double"
+},
+"shouldBeInvoiced": {
+"type": "boolean",
+"description": "Indikerer om varen er lagt til i invoice lines"
+},
+"isDirectProcurement": {
+"type": "boolean",
+"description": "Indikerer at linjen kom fra direkte innkjøp"
+}
+},
+"additionalProperties": false,
+"description": "Medgått vare i et prosjekt"
+},
+"RabbitMQConfigDTO": {
+"type": "object",
+"properties": {
+"hostName": {
+"type": "string",
+"nullable": true
+},
+"port": {
+"type": "integer",
+"format": "int32"
+}
+},
+"additionalProperties": false
+},
+"SupplierGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"supplierNumber": {
+"type": "integer",
+"description": "Leverandør-nummer",
+"format": "int64"
+},
+"organizationNumber": {
+"type": "string",
+"description": "Leverandørens organisasjonsnummer",
+"nullable": true
+},
+"name": {
+"type": "string",
+"description": "Navn",
+"nullable": true
+},
+"address": {
+"type": "string",
+"description": "Adresse",
+"nullable": true
+},
+"postalCode": {
+"type": "string",
+"description": "Postnummer",
+"nullable": true
+},
+"postalAddress": {
+"type": "string",
+"description": "Poststed",
+"nullable": true
+},
+"countryCode": {
+"type": "string",
+"description": "Landkode (NO, SE osv)",
+"nullable": true
+},
+"firstSubmitted": {
+"type": "string",
+"description": "Første gang leverandøren ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"description": "Sist gang leverandøren ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"userDefFields": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/UserDefFieldGetDTO"
+},
+"description": "Liste av brukerdefinerte felter",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"SupplierGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/SupplierGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"SupplierGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/SupplierGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"SupplierInvoiceGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"supplierNumber": {
+"type": "integer",
+"description": "Leverandør - nummer",
+"format": "int64"
+},
+"supplierName": {
+"type": "string",
+"description": "Leverandør - navn",
+"nullable": true
+},
+"year": {
+"type": "integer",
+"description": "Regnskapsår",
+"format": "int32"
+},
+"voucherNumber": {
+"type": "integer",
+"description": "Bilagnummer - kombinasjonen av regnsapsår og bilagnummer er unik, og brukes til å identifisere\r\nfakturaer ved opplasting av fakturaer og utbetalinger.",
+"format": "int64"
+},
+"suppliersInvoiceNumber": {
+"type": "string",
+"description": "Leverandørens fakturanummer",
+"nullable": true
+},
+"suppliersOrderNumber": {
+"type": "string",
+"description": "Leverandørens ordrenummer",
+"nullable": true
+},
+"caseHandlers": {
+"type": "array",
+"items": {
+"type": "string"
+},
+"description": "Saksbehandlere",
+"nullable": true
+},
+"invoiceDate": {
+"type": "string",
+"description": "Fakturadato",
+"format": "date-time"
+},
+"dueDate": {
+"type": "string",
+"description": "Forfallsdato - NB kan vÃ¦re null",
+"format": "date-time",
+"nullable": true
+},
+"registrationDate": {
+"type": "string",
+"description": "Registreringsdato (dvs registrert i Cordel)",
+"format": "date-time",
+"nullable": true
+},
+"ledgerDate": {
+"type": "string",
+"description": "Dato for bokføring",
+"format": "date-time",
+"nullable": true
+},
+"period": {
+"type": "integer",
+"description": "Periode fakturaen er bokført på. 0= inng balanse, 13 = årsavslutningsposteringer,  1 - 12 er måned i året.",
+"format": "int32",
+"nullable": true
+},
+"paymentId": {
+"type": "string",
+"description": "KID",
+"nullable": true
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse",
+"nullable": true
+},
+"invoiceType": {
+"type": "string",
+"description": "Type: \"Invoice\" eller \"CreditNote\"",
+"nullable": true
+},
+"source": {
+"type": "string",
+"description": "Hvordan fakturaen er registrert: \"Manual\" eller \"Autofakt\".",
+"nullable": true
+},
+"department": {
+"type": "string",
+"description": "Avdeling",
+"nullable": true
+},
+"projectNumber": {
+"type": "integer",
+"description": "Cordels ordrenummer - kan vÃ¦re null",
+"format": "int64",
+"nullable": true
+},
+"jobNumber": {
+"type": "string",
+"description": "Cordels jobbnummer - kan vÃ¦re null",
+"nullable": true
+},
+"purchaseOrderNumber": {
+"type": "integer",
+"description": "Cordels bestillingsnummer - kan vÃ¦re null",
+"format": "int64",
+"nullable": true
+},
+"payableAmount": {
+"type": "number",
+"description": "Faktura-beløp",
+"format": "double"
+},
+"currency": {
+"type": "string",
+"description": "Valuta (valuta-kode) for PayableAmount",
+"nullable": true
+},
+"amount": {
+"type": "number",
+"description": "Bokført faktura-beløp, alltid i NOK",
+"format": "double"
+},
+"vatAmount": {
+"type": "number",
+"description": "Beløp mva (NOK)",
+"format": "double"
+},
+"firstSubmitted": {
+"type": "string",
+"description": "Første gang fakturaen ble sendt inn til C3-DataWarehouse",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"description": "Siste gang fakturaen ble sendt inn til C3-DataWarehouse",
+"format": "date-time"
+},
+"invoiceLines": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/SupplierInvoiceLineGetDTO"
+},
+"description": "Faktura-spesifikasjonen",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"SupplierInvoiceGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/SupplierInvoiceGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"SupplierInvoiceGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/SupplierInvoiceGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"SupplierInvoiceLineGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse",
+"nullable": true
+},
+"reference": {
+"type": "string",
+"description": "Referanse",
+"nullable": true
+},
+"projectNumber": {
+"type": "integer",
+"description": "Ordrenummer",
+"format": "int64",
+"nullable": true
+},
+"jobNumber": {
+"type": "string",
+"description": "Jobbnummer",
+"nullable": true
+},
+"purchaseOrderNumber": {
+"type": "integer",
+"description": "Bestillingsnummer",
+"format": "int64",
+"nullable": true
+},
+"quantity": {
+"type": "number",
+"description": "Antall",
+"format": "double"
+},
+"unit": {
+"type": "string",
+"description": "Enhet",
+"nullable": true
+},
+"itemId": {
+"type": "string",
+"description": "Varenummer",
+"nullable": true
+},
+"grossPrice": {
+"type": "number",
+"description": "Bruttopris",
+"format": "double"
+},
+"discount": {
+"type": "number",
+"description": "Rabatt",
+"format": "double"
+},
+"discount2": {
+"type": "number",
+"description": "Rabatt 2",
+"format": "double"
+},
+"markup": {
+"type": "number",
+"description": "Tillegg",
+"format": "double"
+},
+"price": {
+"type": "number",
+"description": "Nettopris",
+"format": "double"
+},
+"amount": {
+"type": "number",
+"description": "Beløp eks. mva",
+"format": "double"
+},
+"vatAmount": {
+"type": "number",
+"description": "Mva-beløp",
+"format": "double"
+},
+"amountIncVat": {
+"type": "number",
+"description": "Beløp ink. mva",
+"format": "double"
+}
+},
+"additionalProperties": false
+},
+"SupplierPaymentGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"year": {
+"type": "integer",
+"description": "Regnskapsår",
+"format": "int32"
+},
+"voucherNumber": {
+"type": "integer",
+"description": "Bilagnummer",
+"format": "int64"
+},
+"paymentDate": {
+"type": "string",
+"description": "Betalingsdato",
+"format": "date-time"
+},
+"ledgerDate": {
+"type": "string",
+"description": "Bokført dato",
+"format": "date-time"
+},
+"period": {
+"type": "integer",
+"description": "Periode fakturaen er bokført på. 0= inng balanse, 13 = årsavslutningsposteringer,  1 - 12 er måned i året.",
+"format": "int32",
+"nullable": true
+},
+"amount": {
+"type": "number",
+"description": "Innbetalt beløp",
+"format": "double"
+},
+"bankAccount": {
+"type": "string",
+"description": "Bankkonto - betalt fra",
+"nullable": true
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse",
+"nullable": true
+},
+"firstSubmitted": {
+"type": "string",
+"description": "Første gang betalingen ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"description": "Siste gang betalingen ble sendt inn - dato og tidspunkt (UTC)",
+"format": "date-time"
+},
+"paymentLines": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/SupplierPaymentLineGetDTO"
+},
+"description": "Angir hva som er betalt: fakturaer, akonto til leverandører osv.",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"SupplierPaymentGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/SupplierPaymentGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"SupplierPaymentGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/SupplierPaymentGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"SupplierPaymentLineGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"format": "uuid"
+},
+"supplierNumber": {
+"type": "integer",
+"description": "Leverandørnummer - refererer til en Supplier",
+"format": "int32"
+},
+"year": {
+"type": "integer",
+"description": "Inngående faktura - Regnskapsår. \r\nEr null på akonto-betalinger.",
+"format": "int32",
+"nullable": true
+},
+"voucherNumber": {
+"type": "integer",
+"description": "Inngående faktura - Bilagnummer. Kombinasjonen av bilagnummer og regnsapsår identifiserer en \r\ninngående faktura. Er null på akonto-betalinger,",
+"format": "int32",
+"nullable": true
+},
+"supplierInvoiceNumber": {
+"type": "string",
+"description": "Inngående faktura - Leverandørens fakturanummer. Er null på akonto-betalinger.",
+"nullable": true
+},
+"paymentId": {
+"type": "string",
+"description": "Kid",
+"nullable": true
+},
+"amount": {
+"type": "number",
+"description": "Betalt beløp",
+"format": "double"
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse",
+"nullable": true
+},
+"toAccount": {
+"type": "string",
+"description": "Bankkonto - betalt til",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"UserDefFieldGetDTO": {
+"type": "object",
+"properties": {
+"name": {
+"type": "string",
+"description": "FieldName. Must be unique",
+"nullable": true
+},
+"type": {
+"type": "integer",
+"description": "FieldType Numeric=, AlphaNum=, Date=, Menu=, MultiSelect =",
+"format": "int32"
+},
+"value": {
+"type": "string",
+"description": "Startdato for regnskapsï¿½ret",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"UserInfoDTO": {
+"type": "object",
+"properties": {
+"tenantId": {
+"type": "string",
+"format": "uuid"
+},
+"userId": {
+"type": "string",
+"format": "uuid"
+},
+"modules": {
+"type": "string",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"VoucherGetDTO": {
+"type": "object",
+"properties": {
+"id": {
+"type": "string",
+"description": "Unik id",
+"format": "uuid"
+},
+"year": {
+"type": "integer",
+"description": "Regnskapsår",
+"format": "int32"
+},
+"voucherType": {
+"type": "integer",
+"description": "Bilagtype. Samme typekode som i Cordel.",
+"format": "int32"
+},
+"voucherTypeDescription": {
+"type": "string",
+"description": "Beskrivelse av VoucherType:\r\n1 => \"Customer Invoice (BT_UTFAKT)\",\r\n2 => \"Supplier Invoice (BT_INNFAKT)\",\r\n3 => \"Bank electronic (BT_BANKBBS)\",\r\n4 => \"Bank manual (BT_BANKMAN)\",\r\n5 => \"Miscellaneous (BT_DIVERSE)\",\r\n6 => \"Overdue notice (BT_PURRING)\",\r\n7 => \"Cash payments (BT_KASSE)\",",
+"nullable": true
+},
+"voucherNumber": {
+"type": "integer",
+"description": "Bilagnummer - kombinasjonen av Year, VoucherType og VoucherNumber er unik.",
+"format": "int64"
+},
+"voucherDate": {
+"type": "string",
+"description": "Bilagdato",
+"format": "date-time"
+},
+"registeredDate": {
+"type": "string",
+"description": "Registrert dato",
+"format": "date-time"
+},
+"description": {
+"type": "string",
+"description": "Beskrivelse",
+"nullable": true
+},
+"firstSubmitted": {
+"type": "string",
+"description": "Første gang bilaget ble lagret i datavarehuset",
+"format": "date-time"
+},
+"lastSubmitted": {
+"type": "string",
+"description": "Sist gang bilaget ble oppdatert i datavarehuset.",
+"format": "date-time"
+},
+"period": {
+"type": "integer",
+"description": "Perioden bilaget er bokført på. 0 = Inngående balanse, 13 = Ã…rsavslutningsposteringer, 1 til 12 er måned i året.",
+"format": "int32",
+"nullable": true
+},
+"postings": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/LedgerPostingGetDTO"
+},
+"description": "Posteringene i bilaget",
+"nullable": true
+},
+"documents": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/DocumentDTO"
+},
+"description": "Dokumentene til bilaget.",
+"nullable": true
+}
+},
+"additionalProperties": false
+},
+"VoucherGetDTOListResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/VoucherGetDTO"
+},
+"nullable": true
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+},
+"VoucherGetDTOResponseDTO": {
+"type": "object",
+"properties": {
+"payload": {
+"$ref": "#/components/schemas/VoucherGetDTO"
+},
+"message": {
+"type": "string",
+"nullable": true
+},
+"statusCode": {
+"type": "integer",
+"format": "int32"
+},
+"serviceTime": {
+"type": "string",
+"format": "date-time"
+},
+"pagingInfo": {
+"$ref": "#/components/schemas/PagingDTO"
+}
+},
+"additionalProperties": false
+}
+}
+}
+}

@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +27,7 @@ namespace Datawarehouse_Backend.Context
         public DbSet<Post> Posts { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<FinancialYear> FinancialYears { get; set; }
+        public DbSet<KPIMetrics> KPIMetrics { get; set; }
         //public DbSet<AccountsReceivable> AccountsReceivables { get; set; }
 
         public Tennant findTennantById(long tennantId)
