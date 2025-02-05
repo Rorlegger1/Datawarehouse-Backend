@@ -1,3 +1,68 @@
+# Cordel Data Analysis System
+
+## System Overview
+Cordel er et omfattende forretningssystem med følgende hovedmoduler:
+
+### 1. Salg/Kalkyler
+- Kunder/Marked
+- Kalkylasjon/Tilbud
+- Prosjektanbud
+- Direkt mail
+- Varer/Prislok
+- Favorittleverandører
+- Pakker
+- Kampanjer
+- Anlegg
+
+### 2. Ordre
+- Ordrer (Alle)
+- Serviceordrer
+- Prosjektordrer
+- Serviceavtaler
+- Avvik
+- Dokumenter til signering
+
+### 3. Økonomi
+- Faktura/Kundereskontro
+- Leverandørreskontro
+- Regnskap
+
+### 4. Lager/Innkjøp
+- Butikksalg
+- Lager
+- Innkjøp
+- Pakker med standardpriser og beskrivelser
+
+## Data Structure
+Systemet inneholder følgende hovedentiteter:
+
+1. **Kunder**
+   - Kundenummer
+   - Navn
+   - Adresse
+   - Postnr/Sted
+   - Kontaktinformasjon
+   - Omsetning
+
+2. **Tilbud/Anbud**
+   - Tilbudsnummer
+   - Prosjekt
+   - Kunde
+   - Prosjektbeskrivelse
+   - Beløp
+   - Status
+   - Datoer
+   - Saksbehandler
+
+3. **Pakker/Produkter**
+   - Produktnummer
+   - Beskrivelse
+   - Enhet
+   - Pris u/arbeid
+   - Pris inkl. arbeid
+   - Kategori
+   - Standardpriser
+
 # Datawarehouse-Backend
 
 ## Project Name & Pitch

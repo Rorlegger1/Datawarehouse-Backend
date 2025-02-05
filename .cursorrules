@@ -1,0 +1,77 @@
+# Cordel API Integration Rules
+
+# API Configuration
+API_BASE_URL = "https://api.cordel.no"
+API_VERSION = "v1"
+
+# Data Access Patterns
+ALLOWED_ENDPOINTS = [
+    "customers",
+    "offers",
+    "orders",
+    "products",
+    "invoices",
+    "timeregistration"
+]
+
+# Standard Query Parameters
+STANDARD_PARAMS = {
+    "date_from": "YYYY-MM-DD",
+    "date_to": "YYYY-MM-DD",
+    "status": ["active", "completed", "cancelled"],
+    "limit": 100,
+    "offset": 0
+}
+
+# Data Validation Rules
+VALIDATION_RULES = {
+    "customer_number": "required|numeric",
+    "project_number": "required|numeric",
+    "amount": "required|numeric|min:0",
+    "date": "required|date"
+}
+
+# Access Control
+REQUIRED_PERMISSIONS = [
+    "read:customers",
+    "read:offers",
+    "read:orders",
+    "read:invoices",
+    "read:products"
+]
+
+# Utvider API-reglene med ordre-spesifikke regler
+
+# Nye endepunkter
+ALLOWED_ENDPOINTS.extend([
+    "orders",
+    "service_orders",
+    "project_orders",
+    "order_details"
+])
+
+# Ordre-spesifikke søkeparametere
+ORDER_SEARCH_PARAMS = {
+    "type": ["service", "project", "all"],
+    "status": ["active", "completed", "cancelled"],
+    "handler": "string",
+    "customer": "string",
+    "date_range": "date_range"
+}
+
+# Validering for ordre
+ORDER_VALIDATION_RULES = {
+    "order_id": "required|string",
+    "customer_id": "required|string",
+    "amount": "required|numeric|min:0",
+    "status": "required|in:active,completed,cancelled",
+    "handler": "required|string"
+}
+
+# Tilgangsrettigheter for ordre
+ORDER_PERMISSIONS = [
+    "read:orders",
+    "write:orders",
+    "read:service_orders",
+    "write:service_orders"
+] 
