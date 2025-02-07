@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h1 class="mb-4">Project 50 Time Registration Analysis</h1>
+
+    <!-- Summary Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Total Hours</h5>
+                    <p class="card-text display-4 fw-bold">{{ stats.total_hours }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Total Employees</h5>
+                    <p class="card-text display-4 fw-bold">{{ stats.total_employees }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Total Projects</h5>
+                    <p class="card-text display-4 fw-bold">{{ stats.total_projects }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Avg Hours/Project</h5>
+                    <p class="card-text display-4 fw-bold">{{ stats.avg_hours_per_project }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Projects Chart -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="projectChart" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Trend and Employee Distribution -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="trendChart" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="employeeChart" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    .card {
+        border-radius: 10px;
+        border: none;
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .chart-container {
+        min-height: 400px;
+    }
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    .shadow-sm {
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+    }
+</style>
+
+<!-- Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<script>
+    // Create the project hours chart
+    var projectsGraph = {{ plots.projects | safe }};
+    Plotly.newPlot('projectChart', projectsGraph.data, projectsGraph.layout);
+
+    // Create the monthly trend chart
+    var trendGraph = {{ plots.trend | safe }};
+    Plotly.newPlot('trendChart', trendGraph.data, trendGraph.layout);
+
+    // Create the employee distribution chart
+    var employeeGraph = {{ plots.employees | safe }};
+    Plotly.newPlot('employeeChart', employeeGraph.data, employeeGraph.layout);
+
+    // Make charts responsive
+    window.addEventListener('resize', function() {
+        Plotly.Plots.resize('projectChart');
+        Plotly.Plots.resize('trendChart');
+        Plotly.Plots.resize('employeeChart');
+    });
+</script>
+{% endblock %} 

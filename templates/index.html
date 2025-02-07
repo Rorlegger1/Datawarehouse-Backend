@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Time Registration Dashboard</h1>
+    
+    <!-- Summary Statistics -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Hours</h5>
+                    <p class="card-text display-4">{{ "%.1f"|format(total_hours) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Cost</h5>
+                    <p class="card-text display-4">{{ "%.2f"|format(total_cost) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Employees</h5>
+                    <p class="card-text display-4">{{ employee_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Projects</h5>
+                    <p class="card-text display-4">{{ project_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Projects -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Top Projects by Hours</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Project Number</th>
+                                <th>Project Name</th>
+                                <th>Total Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in top_projects %}
+                            <tr>
+                                <td>{{ project.project_number }}</td>
+                                <td>{{ project.project_name }}</td>
+                                <td>{{ "%.1f"|format(project.total_hours) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Registrations -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Latest Time Registrations</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Employee</th>
+                                <th>Project</th>
+                                <th>Hours</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reg in latest_registrations %}
+                            <tr>
+                                <td>{{ reg.date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ reg.employee_name }}</td>
+                                <td>{{ reg.project_name }}</td>
+                                <td>{{ "%.1f"|format(reg.hours) }}</td>
+                                <td>{{ reg.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

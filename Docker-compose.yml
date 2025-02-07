@@ -1,8 +1,29 @@
-version: '3'
-services: 
-  
-  logindb:
-    image: postgres:alpine
+version: '3.8'
 
-  warehousedb:
-    image: postgres:alpine
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/timeregister
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=timeregister
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

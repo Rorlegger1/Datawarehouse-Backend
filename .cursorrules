@@ -1,8 +1,10 @@
 # Cordel API Integration Rules
 
 # API Configuration
-API_BASE_URL = "https://api.cordel.no"
+API_BASE_URL = "https://api.smartcraft.cloud"
 API_VERSION = "v1"
+API_USERNAME = "datavarehus.integrasjon@ror-system.no"
+API_PASSWORD = "qA02bRux!3eD"
 
 # Data Access Patterns
 ALLOWED_ENDPOINTS = [
@@ -74,4 +76,50 @@ ORDER_PERMISSIONS = [
     "write:orders",
     "read:service_orders",
     "write:service_orders"
+]
+
+# Time Registration Data Structure
+TIME_REGISTRATION_RULES = {
+    "access_path": "/api/Projects",
+    "data_location": "usedWork",
+    "required_fields": [
+        "employeeNumber",
+        "employeeName",
+        "hours",
+        "cost",
+        "date",
+        "jobNumber",
+        "taskNumber",
+        "comment"
+    ],
+    "date_format": "YYYY-MM-DD",
+    "aggregation_levels": [
+        "by_employee",
+        "by_month",
+        "by_project"
+    ]
+}
+
+# Time Registration Query Parameters
+TIME_REGISTRATION_PARAMS = {
+    "pageSize": 100,
+    "pageNumber": 1,
+    "submittedAfter": "YYYY-MM-DD",
+    "submittedBefore": "YYYY-MM-DD"
+}
+
+# Data Validation Rules
+TIME_VALIDATION_RULES = {
+    "hours": "required|numeric|min:0",
+    "cost": "numeric|min:0",
+    "employeeNumber": "required|string",
+    "employeeName": "required|string",
+    "date": "required|date"
+}
+
+# Access Control for Time Registration
+TIME_REGISTRATION_PERMISSIONS = [
+    "read:projects",
+    "read:timeregistrations",
+    "read:employees"
 ] 

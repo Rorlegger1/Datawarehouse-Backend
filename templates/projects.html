@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Project Time Registration Summary</h1>
+    
+    <div class="card mt-4">
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Project Number</th>
+                        <th>Project Name</th>
+                        <th>Total Hours</th>
+                        <th>Total Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                    <tr>
+                        <td>{{ project.project_number }}</td>
+                        <td>{{ project.project_name }}</td>
+                        <td>{{ "%.1f"|format(project.total_hours) }}</td>
+                        <td>{{ "%.2f"|format(project.total_cost) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 
