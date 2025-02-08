@@ -11,12 +11,13 @@ class CordelAPIClient:
                  password: str = "qA02bRux!3eD", 
                  base_url: str = "https://api.smartcraft.cloud",  # Back to Smartcraft URL
                  tenant_id: str = "3744c6ca-4149-4627-8e8f-ac95fb793b4e"):
+        """Initialize the API client with credentials."""
         self.username = username
         self.password = password
         self.base_url = base_url.rstrip('/')
         self.tenant_id = tenant_id
         self.auth_token = None
-        self.refresh_token = None
+        self.token_expiry = None
         self.modules = ["90000", "93000"]  # From JWT token
         self._authenticate()
 
@@ -153,88 +154,42 @@ class CordelAPIClient:
             DataFrame containing time registration data
         """
         try:
-            print(f"Fetching time registrations for project: {project_number}")
+            print(f"Fetching time registrations for period: {date_from} to {date_to}")
             
-            # Construct the API endpoint according to the rules
-            endpoint = "/api/Projects"
-            if project_number:
-                endpoint = f"{endpoint}/{project_number}"
+            # Use the DataWarehouse endpoint for time registrations
+            endpoint = "/DataWarehouse/api/TimeRegistrations"
             
             # Add query parameters
-            params = {}
+            params = {
+                "pageSize": 1000,  # Get more records at once
+                "pageNumber": 0
+            }
             if date_from:
                 params["submittedAfter"] = date_from
             if date_to:
                 params["submittedBefore"] = date_to
+            if project_number:
+                params["projectNumber"] = project_number
             
             # Make the API request
             print(f"Making request to endpoint: {endpoint}")
             response = self._make_request("GET", endpoint, params=params)
             
             print("API Response received")
-            print(f"Response type: {type(response)}")
             
             if isinstance(response, dict) and "payload" in response:
                 data = response["payload"]
-                print(f"Data type: {type(data)}")
-                
-                time_entries = []
-                
-                if project_number:
-                    # For single project, data is in usedWork field
-                    if isinstance(data, dict) and "usedWork" in data:
-                        time_entries = data["usedWork"]
-                        print(f"Found {len(time_entries)} time entries in usedWork")
-                else:
-                    # For all projects, collect all time entries
-                    if isinstance(data, list):
-                        for project in data:
-                            if isinstance(project, dict) and "usedWork" in project:
-                                project_entries = project["usedWork"]
-                                # Add project info to each entry
-                                for entry in project_entries:
-                                    entry["projectNumber"] = project.get("projectNumber")
-                                    entry["projectName"] = project.get("projectName")
-                                time_entries.extend(project_entries)
-                    print(f"Found total of {len(time_entries)} time entries")
-                
-                if time_entries:
-                    # Convert to DataFrame
-                    df = pd.DataFrame(time_entries)
-                    print("Created DataFrame with columns:", df.columns.tolist())
-                    
-                    # Rename columns for consistency
-                    column_mapping = {
-                        "employeeNumber": "employeeNumber",
-                        "employeeName": "employeeName",
-                        "projectNumber": "projectNumber",
-                        "projectName": "projectName",
-                        "quantity": "quantity",
-                        "cost": "cost",
-                        "date": "date",
-                        "comment": "comment"
-                    }
-                    
-                    # Only rename columns that exist
-                    rename_cols = {k: v for k, v in column_mapping.items() if k in df.columns}
-                    df = df.rename(columns=rename_cols)
-                    
-                    # Convert date column to datetime if it exists
-                    if "date" in df.columns:
-                        df["date"] = pd.to_datetime(df["date"])
-                    
-                    return df
+                if isinstance(data, list) and data:
+                    return pd.DataFrame(data)
                 else:
                     print("No time entries found")
                     return pd.DataFrame()
             else:
-                print("Unexpected response format:", response)
+                print("Invalid response format")
                 return pd.DataFrame()
                 
         except Exception as e:
-            print(f"Error in get_time_registrations: {str(e)}")
-            import traceback
-            traceback.print_exc()
+            print(f"Error fetching time registrations: {str(e)}")
             return pd.DataFrame()
 
     def get_customers(self, filters: Optional[Dict] = None) -> pd.DataFrame:
@@ -477,3 +432,10 @@ class CordelAPIClient:
         except Exception as e:
             print(f"Error searching documents: {str(e)}")
             raise 
+
+    def _should_refresh_token(self) -> bool:
+        """Check if the token needs to be refreshed."""
+        if not self.token_expiry:
+            return True
+        # Refresh if token expires in less than 5 minutes
+        return datetime.now() + timedelta(minutes=5) >= self.token_expiry 
